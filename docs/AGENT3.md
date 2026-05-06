@@ -1,17 +1,21 @@
-# AGENT 3 — Lawyer + admin + payments + deploy
+# AGENT 3 — Lawyer + admin + deploy
 
-You own the supply side of the marketplace and everything that turns it
-into a business: lawyer signup, the lawyer panel, the admin queue, the
-credit/payment system that makes lawyers spend money to receive leads,
-the notification pipeline that delivers leads, and the production deploy.
+You own the supply side of the marketplace and the production-deploy
+workflow: lawyer signup, the lawyer panel, the admin queue, the lead
+notification pipeline that delivers customer requests to verified lawyers,
+and the production deploy.
+
+The marketplace is **free for both sides** — no credit-purchase or payment
+flow. Lawyers receive matching leads as long as they are verified and
+active. (A future monetization strategy can be added later if the user
+wants one; not in scope here.)
 
 ## Read first
 
 1. `CLAUDE.md` — project context, conventions, design language
 2. `docs/AGENT-SPLIT.md` — how your work fits with Agent 1 and Agent 2
-3. `~/Documents/musavirbul-36f6bc47/CLAUDE.md` and `docs/RUNBOOK.md` —
-   the proven Müşavirbul patterns for accountant signup, panel layout,
-   credit packages, lead notification edge function, and iyzico sketch.
+3. `~/Documents/musavirbul-36f6bc47/CLAUDE.md` — proven patterns for
+   accountant signup, panel layout, and lead notification edge functions.
    Adapt to the lawyer vertical; don't copy verbatim.
 
 ## Track 3A — Auth (do this first)
@@ -80,23 +84,22 @@ and admin tools share one implementation.
 
 Pages under `src/pages/panel/`:
 
-- `PanelDashboard.tsx` — stats (kalan kredi, son 7 gün lead sayısı,
-  ortalama yanıt süresi), CTA to /panel/talepler
+- `PanelDashboard.tsx` — stats (last 7d lead count, average response
+  time), CTA to /panel/talepler, verification-status banner
 - `PanelProfile.tsx` — edit `lawyer_profiles` (bio, practice areas,
   district, show_email, show_phone, avatar upload to
-  `lawyer-documents` bucket)
+  `lawyer-avatars` bucket)
 - `PanelLeads.tsx` (`/panel/talepler`) — list `request_notification_logs`
-  for this lawyer, joined with PII fields from `requests` (only the
-  rows they've been billed for)
+  for this lawyer, joined with PII fields from `requests`
 - `PanelQuotes.tsx` (`/panel/teklifler`) — view sent quotes, send new
   quotes to leads
-- `PanelCredits.tsx` (`/panel/krediler`) — buy credits via iyzico, view
-  ledger
 - `PanelVerification.tsx` (`/panel/dogrulama`) — upload baro
   certificate, status (pending/verified/rejected + admin notes)
 
-A `lawyer-documents` Supabase storage bucket is needed (`public: false`)
-— write a migration that creates it.
+Two storage buckets are needed:
+- `lawyer-avatars` (`public: true`) for profile photos shown in directory
+- `lawyer-documents` (`public: false`) for baro certificates, signed-URL
+  preview by admin
 
 ## Track 3D — Admin (`/admin/*`)
 
@@ -104,14 +107,14 @@ A `lawyer-documents` Supabase storage bucket is needed (`public: false`)
 
 Pages:
 
-- `AdminDashboard.tsx` — counts: pending applications, pending
-  verifications, recent requests (last 24h, 7d)
+- `AdminDashboard.tsx` — counts: pending applications, verified lawyers,
+  active lawyers, recent requests (last 24h, 7d, total, open)
 - `AdminApplications.tsx` (`/admin/basvurular`) — pending lawyer
   applications. Approve → sets `application_status = 'approved'` and
   the linked `lawyer_profiles.verification_status = 'verified'`. Reject
   with notes → sets to `rejected`.
 - `AdminLawyers.tsx` (`/admin/avukatlar`) — view all lawyer profiles,
-  toggle `is_active`, edit if needed.
+  toggle `is_active`, link to public profile.
 
 Bootstrap: write a SQL helper `public.promote_to_admin(p_email text)`
 that the human user can call once via `supabase db query --linked` to
@@ -121,84 +124,36 @@ bootstrap the first admin.
 
 Edge function `supabase/functions/notify-lawyers/index.ts`. Trigger:
 Postgres `AFTER INSERT ON public.requests` calls `pg_net.http_post` to
-the function. The function:
+the function URL with a shared secret stored in `app_settings`. The
+function:
 
-1. Reads the request by id
-2. Selects up to 3 candidate lawyers:
-   ```
-   from lawyer_profiles
-   where is_active and verification_status = 'verified'
-     and (district = request.district OR district is null)
-     and request.practice_area = ANY(practice_areas)
-   order by credit_balance desc
-   limit 3
-   ```
-3. For each, deducts 1 credit, inserts into `request_notification_logs`
-   (idempotent via UNIQUE constraint), sends email via
-   Resend/Postmark with the lead's contact info + case description
-4. If fewer than 3 lawyers match, sends to whoever does match; logs the
-   shortfall
+1. Verifies the shared secret in the `X-Notify-Secret` header
+2. Idempotency short-circuit: if `request_notification_logs` already has
+   rows for this `request_id`, returns 200 with `status=already_processed`
+3. Loads the request via service role
+4. Calls `pick_lawyers_for_request(request_id)` RPC which returns up to
+   3 candidates: same district first, then any district, ordered by
+   `lawyer_profiles.created_at` ascending (deterministic, fair)
+5. For each candidate calls `record_lead_notification(request_id, lawyer_id)`
+   RPC which idempotently inserts into `request_notification_logs` and
+   returns `(notified boolean, log_id uuid)`
+6. On `notified=true`, sends an HTML+text email via Resend (with
+   console-log fallback when `RESEND_API_KEY` is missing)
 
-Resend or Postmark — pick one based on what the user has access to. If
-neither, document as a follow-up and stub email sending with console
-logging.
+Email template includes the lead's contact info, case description,
+urgency, and a CTA back to `/panel/talepler`. KVKK-compliant footer.
 
-Email template: HTML + plain text. Include unsubscribe link
-(GDPR/KVKK-compliant). Use `track-open` and `track-click` pixels (write
-those edge functions too — same pattern as Müşavirbul).
+To enable real email sending, the operator must:
+1. Verify `avukatistanbul.net` in Resend (DNS records)
+2. `supabase secrets set RESEND_API_KEY=re_... --project-ref kcukkqnkhvhphfdebcuh`
+3. Optional: `supabase secrets set "RESEND_FROM=AvukatIstanbul <noreply@avukatistanbul.net>"`
 
-## Track 3F — Credits & iyzico payments
+Until then the function logs `skipped_no_api_key` and records the
+notification log row anyway (so PanelLeads stays in sync).
 
-New tables (migration):
+## Track 3F — Lawyer-side analytics
 
-```sql
-create table public.lawyer_credits (
-  lawyer_id uuid primary key references lawyer_profiles(id) on delete cascade,
-  balance integer not null default 0 check (balance >= 0),
-  updated_at timestamptz not null default now()
-);
-
-create table public.credit_transactions (
-  id uuid primary key default gen_random_uuid(),
-  lawyer_id uuid not null references lawyer_profiles(id) on delete cascade,
-  delta integer not null,
-  reason text not null,  -- 'purchase' | 'lead_charge' | 'refund' | 'admin_adjustment'
-  metadata jsonb,
-  created_at timestamptz not null default now()
-);
-
-create table public.credit_purchase_requests (
-  id uuid primary key default gen_random_uuid(),
-  lawyer_id uuid not null references lawyer_profiles(id) on delete cascade,
-  package_id text not null,
-  credits integer not null,
-  amount_try numeric(10,2) not null,
-  status text not null default 'pending',  -- 'pending' | 'paid' | 'failed' | 'refunded'
-  iyzico_token text,
-  iyzico_payment_id text,
-  created_at timestamptz not null default now(),
-  paid_at timestamptz
-);
-```
-
-Credit package definitions in `app_settings.value` JSON (key:
-`credit_packages`). Frontend reads from `app_settings`, never hardcoded.
-
-Edge functions:
-
-- `iyzico-create-checkout/index.ts` — initiates iyzico checkout, returns
-  the iyzico checkout form URL. Uses iyzico API (server-to-server) with
-  the merchant credentials from environment secrets.
-- `iyzico-webhook/index.ts` — receives iyzico's payment callback,
-  verifies signature, updates `credit_purchase_requests.status = 'paid'`,
-  inserts `credit_transactions` row, updates `lawyer_credits.balance`.
-
-Iyzico merchant credentials need to be set in Supabase function env
-vars. Document in `docs/RUNBOOK.md` (create this file) how to add them.
-
-## Track 3G — Lawyer-side analytics
-
-Extend `src/lib/analytics.ts` (Agent 2 owns the file, you add functions).
+Extend `src/lib/analytics.ts` (Agent 2 owns the file, you append).
 Don't redefine the public API — append:
 
 ```ts
@@ -206,21 +161,16 @@ export function trackLawyerPanelEvent(
   event:
     | "lawyer_dashboard_viewed"
     | "lawyer_lead_viewed"
-    | "lawyer_credit_purchased"
-    | "lawyer_verification_submitted"
-    | "lawyer_quote_sent",
+    | "lawyer_quote_sent"
+    | "lawyer_verification_submitted",
   params?: Record<string, unknown>,
 ): void;
 ```
 
 Call sites: `PanelDashboard` mount, `PanelLeads` row expand,
-`PanelCredits` purchase request insert, `PanelVerification` submit,
-`PanelQuotes` quote send.
+`PanelQuotes` quote send, `PanelVerification` submit.
 
-If Agent 2 hasn't shipped `analytics.ts` yet, ship a stub that they'll
-extend. Coordinate via `docs/AGENT-SPLIT.md`'s contract.
-
-## Track 3H — Cloudflare Pages connect & deploy
+## Track 3G — Cloudflare Pages connect & deploy
 
 Once Agent 1 has the sitemap edge function and Agent 2 has the request
 flow merged, you wire production deploy:
@@ -241,8 +191,7 @@ flow merged, you wire production deploy:
    regressions.
 
 Write `docs/RUNBOOK.md` covering: applying migrations, deploying edge
-functions, rotating Supabase service role, iyzico merchant credential
-rotation, common breakage one-liners.
+functions, rotating Supabase service role, common breakage one-liners.
 
 ## File ownership
 
@@ -253,9 +202,9 @@ rotation, common breakage one-liners.
 - `src/components/panel/*.tsx`, `src/components/admin/*.tsx`
 - `src/components/auth/*.tsx`
 - `src/hooks/useAuth.ts`
-- `supabase/functions/notify-lawyers/`, `iyzico-create-checkout/`,
-  `iyzico-webhook/`, `track-open/`, `track-click/`
-- All `supabase/migrations/<ts>_*` related to lawyer/admin/payments
+- `src/lib/avatar.ts`
+- `supabase/functions/notify-lawyers/`
+- All `supabase/migrations/<ts>_*` related to lawyer/admin
 - `docs/RUNBOOK.md` (new)
 
 **You append to**:
@@ -283,13 +232,10 @@ rotation, common breakage one-liners.
   pending application at `/admin/basvurular`, approve it, and the
   lawyer's profile flips to `verified` + appears in `/avukat-bul`.
 - A verified lawyer can log in, see `/panel`, view their dashboard,
-  edit profile, and visit `/panel/krediler`.
-- A lawyer can purchase credits via iyzico (works against iyzico's
-  sandbox / staging if production credentials aren't ready); webhook
-  updates balance.
-- When a customer creates a request (Agent 2's flow), 3 verified
-  lawyers in the matching practice area + district receive an email and
-  have their credits deducted.
+  edit profile, upload baro doc on `/panel/dogrulama`.
+- When a customer creates a request (Agent 2's flow), up to 3 verified
+  lawyers in the matching practice area + city receive an email and
+  a row appears in `request_notification_logs`.
 - `npm run build` clean. All migrations apply via `supabase db push --linked`.
 - Cloudflare Pages live on a preview URL; once domain DNS lands, the
   custom domain serves correctly.
@@ -309,6 +255,9 @@ rotation, common breakage one-liners.
 
 ## Out of scope (explicitly)
 
+- Payments, credit purchases, iyzico — **scrapped** by user decision.
+  The marketplace is free; do not re-add a credit/payment system unless
+  the user explicitly asks.
 - Customer request flow itself, directory, lawyer profile *display* —
   Agent 2 (you provide the data, they render it).
 - Long-form articles, blog posts, sitemap — Agent 1.

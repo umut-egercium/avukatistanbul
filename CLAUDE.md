@@ -1,6 +1,6 @@
 # AvukatIstanbul — Claude Context
 
-**One-line:** Two-sided marketplace at `avukatistanbul.net` connecting people searching for İstanbul lawyers with verified İstanbul Barosu attorneys. Customers post requests; lawyers will pay credits to receive contact info and submit quotes.
+**One-line:** Two-sided marketplace at `avukatistanbul.net` connecting people searching for İstanbul lawyers with verified İstanbul Barosu attorneys. Customers post requests; verified lawyers receive matching leads by email and submit quotes through their panel. The marketplace is free for both sides — no credit-purchase or payment flow.
 
 **Domain:** `avukatistanbul.net` (not yet pointed at hosting)
 **Hosting:** Cloudflare Pages (not yet connected — repo is `umut-egercium/avukatistanbul`)
@@ -113,7 +113,7 @@ supabase/
 | 1 | 11 remaining hizmet detail pages (1500-2000 words each), 36 blog posts (3 per area) | Not started |
 | 2 | Customer request flow `/talep-olustur` + lawyer directory `/avukat-bul/...` | Not started |
 | 3 | Lawyer signup `/avukat-kayit` + lawyer panel `/panel/...` + admin verification `/admin/...` | Not started |
-| 4 | Credit purchases (iyzico/PayTR), lead notifications (resend/postmark), low-balance UX | Not started |
+| 4 | Lead notifications (resend) + lawyer-side analytics events | Not started |
 | 5 | GA4 + dual-send Measurement Protocol + Ads conversion (gclid → enhanced conversions), A/B helper | Not started |
 | 6 | Cloudflare Pages connect + custom domain + Lighthouse polish | Not started |
 
@@ -142,7 +142,7 @@ Phases 1-6 are split MECE-ly into three parallel tracks. If you've been spawned 
 - `docs/AGENT-SPLIT.md` — overview of how the three tracks fit together (read first)
 - `docs/AGENT1.md` — Content & SEO (11 hizmet articles + 36 blog posts + sitemap + robots)
 - `docs/AGENT2.md` — Customer-facing app (request flow + directory + lawyer profile + customer analytics)
-- `docs/AGENT3.md` — Lawyer + admin + payments + deploy (signup + panel + admin + iyzico + notifications + Cloudflare)
+- `docs/AGENT3.md` — Lawyer + admin + deploy (signup + panel + admin + lead notifications + Cloudflare). The credit-purchase / iyzico flow was scrapped by user decision — the marketplace is free for both sides.
 
 Each agent file lists owned files, coordination seams with the other tracks, and acceptance criteria. Stay inside your file ownership; cross-cutting changes go through `AGENT-SPLIT.md` contracts.
 

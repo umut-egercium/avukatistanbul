@@ -9,7 +9,21 @@ import TalepOlustur from "@/pages/TalepOlustur";
 import RequestSuccess from "@/pages/RequestSuccess";
 import Taleplerim from "@/pages/Taleplerim";
 import AvukatKayit from "@/pages/AvukatKayit";
+import Giris from "@/pages/Giris";
+import SifreSifirla from "@/pages/SifreSifirla";
 import NotFound from "@/pages/NotFound";
+
+import PanelLayout from "@/pages/panel/PanelLayout";
+import PanelDashboard from "@/pages/panel/PanelDashboard";
+import PanelProfile from "@/pages/panel/PanelProfile";
+import PanelVerification from "@/pages/panel/PanelVerification";
+import PanelLeads from "@/pages/panel/PanelLeads";
+import PanelQuotes from "@/pages/panel/PanelQuotes";
+
+import AdminLayout from "@/pages/admin/AdminLayout";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import AdminApplications from "@/pages/admin/AdminApplications";
+import AdminLawyers from "@/pages/admin/AdminLawyers";
 
 function App() {
   return (
@@ -25,6 +39,23 @@ function App() {
       <Route path="/talep-basarili" element={<RequestSuccess />} />
       <Route path="/taleplerim" element={<Taleplerim />} />
       <Route path="/avukat-kayit" element={<AvukatKayit />} />
+      {/* Auth (Agent 3) */}
+      <Route path="/giris" element={<Giris />} />
+      <Route path="/sifre-sifirla" element={<SifreSifirla />} />
+      {/* Lawyer panel (Agent 3) */}
+      <Route path="/panel" element={<PanelLayout />}>
+        <Route index element={<PanelDashboard />} />
+        <Route path="profil" element={<PanelProfile />} />
+        <Route path="dogrulama" element={<PanelVerification />} />
+        <Route path="talepler" element={<PanelLeads />} />
+        <Route path="teklifler" element={<PanelQuotes />} />
+      </Route>
+      {/* Admin (Agent 3) */}
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<AdminDashboard />} />
+        <Route path="basvurular" element={<AdminApplications />} />
+        <Route path="avukatlar" element={<AdminLawyers />} />
+      </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
