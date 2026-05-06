@@ -81,7 +81,7 @@ const URGENCY_LABEL: Record<string, string> = {
 interface ResultEntry {
   lawyer_id: string;
   email_status: string;
-  charged: boolean;
+  notified: boolean;
 }
 
 Deno.serve(async (req: Request) => {
@@ -154,7 +154,7 @@ Deno.serve(async (req: Request) => {
   }
   const lawyers = (candidates ?? []) as LawyerRow[];
 
-  // 6. For each: atomic charge+log, then email on success
+  // 6. For each: idempotent log insert, then email on fresh notification
   const results: ResultEntry[] = [];
 
   for (const lawyer of lawyers) {
@@ -166,19 +166,19 @@ Deno.serve(async (req: Request) => {
       results.push({
         lawyer_id: lawyer.id,
         email_status: `record_error:${recordError.message}`,
-        charged: false,
+        notified: false,
       });
       continue;
     }
 
     const row = Array.isArray(recordData) ? recordData[0] : recordData;
-    const charged: boolean = row?.charged ?? false;
+    const notified: boolean = row?.notified ?? false;
 
-    if (!charged) {
+    if (!notified) {
       results.push({
         lawyer_id: lawyer.id,
-        email_status: "skipped_not_charged",
-        charged: false,
+        email_status: "skipped_already_notified",
+        notified: false,
       });
       continue;
     }
@@ -187,7 +187,7 @@ Deno.serve(async (req: Request) => {
     results.push({
       lawyer_id: lawyer.id,
       email_status: emailStatus,
-      charged: true,
+      notified: true,
     });
   }
 
@@ -195,7 +195,7 @@ Deno.serve(async (req: Request) => {
     status: "ok",
     request_id: requestId,
     candidates: lawyers.length,
-    notified: results.filter((x) => x.charged).length,
+    notified: results.filter((x) => x.notified).length,
     results,
   });
 });
@@ -325,7 +325,7 @@ function renderHtml(lawyer: LawyerRow, r: RequestRow): string {
             <a href="https://avukatistanbul.net/panel/talepler" style="display:inline-block;background:#10182b;color:#f7f3ec;padding:12px 22px;border-radius:6px;text-decoration:none;font-weight:600;font-size:14px;">Panele git ve teklif gönder</a>
           </td></tr>
           <tr><td style="padding:16px 24px;border-top:1px solid #ece8db;">
-            <p style="margin:0;font-size:12px;color:#888;line-height:1.5;">Bu lead için bakiyenizden 1 kredi düşüldü. Detaylar: <a href="https://avukatistanbul.net/panel/krediler" style="color:#a87a2e;">panel/krediler</a>.</p>
+            <p style="margin:0;font-size:12px;color:#888;line-height:1.5;">Bu e-posta size, AvukatIstanbul'da uzmanlık alanlarınız ve ilçenizle eşleşen yeni bir müvekkil talebi nedeniyle gönderildi.</p>
             <p style="margin:8px 0 0 0;font-size:11px;color:#aaa;">AvukatIstanbul · İstanbul · avukatistanbul.net</p>
           </td></tr>
         </table>
@@ -355,7 +355,6 @@ function renderText(lawyer: LawyerRow, r: RequestRow): string {
     r.description ? `Notu:\n${r.description}\n` : "",
     "Panelinize gidin: https://avukatistanbul.net/panel/talepler",
     "",
-    "Bu lead için bakiyenizden 1 kredi düşüldü.",
     "AvukatIstanbul · avukatistanbul.net",
   ].filter(Boolean);
   return lines.join("\n");

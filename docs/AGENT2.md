@@ -275,7 +275,7 @@ semantic tokens (`bg-card`, `text-foreground`, etc.).
 - Lawyer signup or any `/avukat-kayit` work — Agent 3.
 - Lawyer panel `/panel/*` — Agent 3.
 - Admin `/admin/*` — Agent 3.
-- Payments, credits, lead notification edge function — Agent 3.
+- Lead notification edge function — Agent 3.
 - Long-form content (articles, blog) — Agent 1.
 - Cloudflare Pages connect — Agent 3.
 - Server-side analytics relay (`ga-mp-track` edge function) — Agent 3 if

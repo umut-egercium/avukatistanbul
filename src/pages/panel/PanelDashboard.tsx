@@ -4,7 +4,6 @@ import {
   AlertTriangle,
   ArrowRight,
   CheckCircle2,
-  Coins,
   Inbox,
   Clock,
   ShieldAlert,
@@ -61,14 +60,7 @@ export default function PanelDashboard() {
 
       <VerificationBanner status={status} hasBarNumber={!!profile?.bar_number} />
 
-      <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard
-          icon={Coins}
-          label="Kalan kredi"
-          value="0"
-          hint="Lead almak için kredi yükleyin."
-          cta={{ to: "/panel/krediler", label: "Kredi yükle" }}
-        />
+      <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <StatCard
           icon={Inbox}
           label="Son 7 günde gelen lead"
@@ -93,7 +85,7 @@ export default function PanelDashboard() {
             done={status === "verified"}
             number={1}
             title="Hesabınızı doğrulayın"
-            body="Baro sicil numaranızı ve baro belgenizi yükleyerek 'doğrulanmış avukat' rozetinizi alın."
+            body="Baro sicil numaranızı ve baro belgenizi yükleyerek 'doğrulanmış avukat' rozetinizi alın. Doğrulanmadan dizinde görünmezsiniz ve lead almazsınız."
             cta={{ to: "/panel/dogrulama", label: "Doğrulamaya git" }}
           />
           <NextStep
@@ -102,13 +94,6 @@ export default function PanelDashboard() {
             title="Profilinizi tamamlayın"
             body="Müvekkillerin sizi seçmesi için kısa tanıtım, deneyim ve uzmanlık alanlarınızı yazın."
             cta={{ to: "/panel/profil", label: "Profili düzenle" }}
-          />
-          <NextStep
-            done={false}
-            number={3}
-            title="Kredi yükleyin"
-            body="İlk lead'i almak için panelinizden kredi paketi seçin. Sadece açtığınız taleplerde kredi düşer."
-            cta={{ to: "/panel/krediler", label: "Krediler" }}
           />
         </ol>
       </section>
@@ -183,7 +168,7 @@ function VerificationBanner({
 }
 
 interface StatCardProps {
-  icon: typeof Coins;
+  icon: typeof Inbox;
   label: string;
   value: string;
   hint?: string;

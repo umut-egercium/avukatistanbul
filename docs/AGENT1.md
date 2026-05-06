@@ -211,7 +211,7 @@ Sitemap: https://avukatistanbul.net/sitemap.xml
   `panel/*`, `admin/*`, `AvukatProfil.tsx`
 - `src/lib/analytics.ts`, `src/hooks/useAuth.ts`
 - `supabase/migrations/*`, `supabase/functions/notify-lawyers/`,
-  `supabase/functions/iyzico-*/`
+  any non-sitemap edge functions
 
 ## Acceptance criteria
 
@@ -233,7 +233,7 @@ Sitemap: https://avukatistanbul.net/sitemap.xml
 
 - Customer request flow, lawyer directory display logic, lawyer profile
   page styling — Agent 2.
-- Lawyer signup, panel, payments, admin — Agent 3.
+- Lawyer signup, panel, admin — Agent 3.
 - GA4/Ads conversion code, A/B testing helper — Agent 2 owns those.
 - Cloudflare Pages config — Agent 3 connects; you provide the
   `_redirects` file content for the sitemap proxy.

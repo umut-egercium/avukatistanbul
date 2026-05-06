@@ -4,7 +4,6 @@ import {
   UserCircle2,
   Inbox,
   FileText,
-  Coins,
   ShieldCheck,
   LogOut,
   Scale,
@@ -25,7 +24,6 @@ const NAV: NavItem[] = [
   { to: "/panel/profil", label: "Profilim", icon: UserCircle2 },
   { to: "/panel/talepler", label: "Gelen Talepler", icon: Inbox },
   { to: "/panel/teklifler", label: "Tekliflerim", icon: FileText },
-  { to: "/panel/krediler", label: "Krediler", icon: Coins },
   { to: "/panel/dogrulama", label: "Doğrulama", icon: ShieldCheck },
 ];
 

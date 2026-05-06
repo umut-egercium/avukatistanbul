@@ -481,8 +481,8 @@ function EmptyState() {
         Henüz lead almadınız
       </h2>
       <p className="mt-2 text-muted-foreground max-w-md mx-auto">
-        Hesabınız doğrulandıktan ve kredi yükledikten sonra, uzmanlık
-        alanlarınız + ilçenizle eşleşen müvekkil talepleri burada listelenir.
+        Hesabınız doğrulandıktan sonra, uzmanlık alanlarınız + ilçenizle
+        eşleşen müvekkil talepleri burada listelenir.
       </p>
     </div>
   );

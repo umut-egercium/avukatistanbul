@@ -12,7 +12,7 @@ boundaries.
 |-------|-------|------|-----------|
 | **AGENT 1** | Content & SEO | All long-form copy, blog, sitemap, robots, structured data polish | Pure parallel — no schema, no auth |
 | **AGENT 2** | Customer-facing app | Request flow, lawyer directory, lawyer profile pages, customer analytics | Reads existing schema, adds public RPCs/views |
-| **AGENT 3** | Lawyer + admin + payments + deploy | Lawyer signup, panel, admin queue, iyzico, lead notifications, Cloudflare connect | Auth, payments, edge functions |
+| **AGENT 3** | Lawyer + admin + deploy | Lawyer signup, panel, admin queue, lead notifications, Cloudflare connect | Auth, edge functions |
 
 ## Why this split is MECE
 
@@ -22,11 +22,11 @@ boundaries.
 - **Schema work is partitioned by table.** Agent 2 touches `requests`,
   `quotes` (customer-side reads/writes) and the `public_lawyer_profiles`
   view. Agent 3 touches `lawyer_profiles`, `lawyer_applications`,
-  `user_roles`, plus new credit/payment tables. Both append migrations under
-  `supabase/migrations/`; ordering is by timestamp so they never collide.
+  `user_roles`, plus the lead-notification machinery. Both append
+  migrations under `supabase/migrations/`; ordering is by timestamp so
+  they never collide.
 - **Edge functions are partitioned.** Agent 1 writes `sitemap`. Agent 3
-  writes `notify-lawyers`, `iyzico-checkout`, `iyzico-webhook`. Agent 2
-  writes none.
+  writes `notify-lawyers`. Agent 2 writes none.
 - **Phase 5 (analytics) and Phase 6 (deploy/polish) are interleaved** rather
   than assigned to a separate agent. Each track adds its own analytics
   events as it builds. Agent 3 owns Cloudflare Pages connect because deploy
@@ -54,7 +54,7 @@ deliverable, NOT in one giant PR:
 
 - `agent1/content` (or feature-scoped sub-branches like `agent1/blog-route`)
 - `agent2/customer-flow` (or `agent2/talep-olustur`, `agent2/directory`)
-- `agent3/lawyer-panel` (or `agent3/payments`, `agent3/admin`)
+- `agent3/lawyer-panel` (or `agent3/admin`, `agent3/deploy`)
 
 Merge frequency: weekly minimum, ideally per coherent slice.
 

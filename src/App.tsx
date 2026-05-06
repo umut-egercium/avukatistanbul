@@ -19,7 +19,6 @@ import PanelProfile from "@/pages/panel/PanelProfile";
 import PanelVerification from "@/pages/panel/PanelVerification";
 import PanelLeads from "@/pages/panel/PanelLeads";
 import PanelQuotes from "@/pages/panel/PanelQuotes";
-import PanelCredits from "@/pages/panel/PanelCredits";
 
 import AdminLayout from "@/pages/admin/AdminLayout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -50,7 +49,6 @@ function App() {
         <Route path="dogrulama" element={<PanelVerification />} />
         <Route path="talepler" element={<PanelLeads />} />
         <Route path="teklifler" element={<PanelQuotes />} />
-        <Route path="krediler" element={<PanelCredits />} />
       </Route>
       {/* Admin (Agent 3) */}
       <Route path="/admin" element={<AdminLayout />}>

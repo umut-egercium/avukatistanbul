@@ -9,7 +9,7 @@ export default function PanelLayout() {
     <AuthGate role="lawyer">
       <MetaTags
         title="Avukat Paneli"
-        description="AvukatIstanbul avukat paneli — gelen talepler, teklifler, krediler, profil ve doğrulama."
+        description="AvukatIstanbul avukat paneli — gelen talepler, teklifler, profil ve doğrulama."
         path={null}
         noindex
       />
