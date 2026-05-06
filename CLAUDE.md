@@ -1,8 +1,8 @@
 # AvukatIstanbul — Claude Context
 
-**One-line:** Two-sided marketplace at `avukatistanbul.com` connecting people searching for İstanbul lawyers with verified İstanbul Barosu attorneys. Customers post requests; lawyers will pay credits to receive contact info and submit quotes.
+**One-line:** Two-sided marketplace at `avukatistanbul.net` connecting people searching for İstanbul lawyers with verified İstanbul Barosu attorneys. Customers post requests; lawyers will pay credits to receive contact info and submit quotes.
 
-**Domain:** `avukatistanbul.com` (not yet pointed at hosting)
+**Domain:** `avukatistanbul.net` (not yet pointed at hosting)
 **Hosting:** Cloudflare Pages (not yet connected — repo is `umut-egercium/avukatistanbul`)
 **Repo:** `~/Documents/avukatistanbul`
 **Built fresh in 2026-05-06 session;** intentionally NOT a fork or copy of `musavirbul-36f6bc47`. Patterns where similar are deliberate (data model, analytics design, migration policy); design language is fully different.
@@ -134,6 +134,17 @@ supabase/
 3. For migrations: see `README.md` § "Database / Supabase".
 4. Long-form content: copy `src/content/categories/bosanma-hukuku.tsx` as the template; legal accuracy matters (cite TMK / İYUK / TCK articles where appropriate).
 5. Before pushing to `main`, `npm run build` must succeed locally.
+
+## Multi-agent workstream
+
+Phases 1-6 are split MECE-ly into three parallel tracks. If you've been spawned to pick up a track, read the corresponding file:
+
+- `docs/AGENT-SPLIT.md` — overview of how the three tracks fit together (read first)
+- `docs/AGENT1.md` — Content & SEO (11 hizmet articles + 36 blog posts + sitemap + robots)
+- `docs/AGENT2.md` — Customer-facing app (request flow + directory + lawyer profile + customer analytics)
+- `docs/AGENT3.md` — Lawyer + admin + payments + deploy (signup + panel + admin + iyzico + notifications + Cloudflare)
+
+Each agent file lists owned files, coordination seams with the other tracks, and acceptance criteria. Stay inside your file ownership; cross-cutting changes go through `AGENT-SPLIT.md` contracts.
 
 ---
 

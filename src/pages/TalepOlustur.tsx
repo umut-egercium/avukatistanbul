@@ -63,10 +63,10 @@ export default function TalepOlustur() {
                 Müşteri talep akışı şu anda geliştiriliyor. İhtiyacınız varsa
                 bu süreçte{" "}
                 <a
-                  href="mailto:hello@avukatistanbul.com"
+                  href="mailto:hello@avukatistanbul.net"
                   className="text-accent font-medium link-underline"
                 >
-                  hello@avukatistanbul.com
+                  hello@avukatistanbul.net
                 </a>{" "}
                 adresine yazabilirsiniz.
               </p>

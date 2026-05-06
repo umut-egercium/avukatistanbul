@@ -1,6 +1,6 @@
 # AvukatIstanbul
 
-Two-sided marketplace at **avukatistanbul.com** (in development) — connects
+Two-sided marketplace at **avukatistanbul.net** (in development) — connects
 people searching for an İstanbul lawyer with verified İstanbul Barosu
 attorneys. Customers post their legal need; lawyers buy lead access in their
 practice area.

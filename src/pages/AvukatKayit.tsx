@@ -106,10 +106,10 @@ export default function AvukatKayit() {
               <p className="text-muted-foreground">
                 Avukat onboarding akışı geliştiriliyor. Erken erişim için{" "}
                 <a
-                  href="mailto:hello@avukatistanbul.com"
+                  href="mailto:hello@avukatistanbul.net"
                   className="text-accent font-medium link-underline"
                 >
-                  hello@avukatistanbul.com
+                  hello@avukatistanbul.net
                 </a>{" "}
                 adresine yazın; doğrulamanız ve panelinizi sizin için
                 hazırlayalım.

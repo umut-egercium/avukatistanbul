@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 
 const SITE_NAME = "AvukatIstanbul";
-const SITE_URL = "https://avukatistanbul.com";
+const SITE_URL = "https://avukatistanbul.net";
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.jpg`;
 
 interface MetaTagsProps {

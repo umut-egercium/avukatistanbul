@@ -25,11 +25,11 @@ export function Footer() {
               en hızlı yolu.
             </p>
             <a
-              href="mailto:hello@avukatistanbul.com"
+              href="mailto:hello@avukatistanbul.net"
               className="mt-5 inline-flex items-center gap-2 text-sm text-foreground/80 hover:text-accent transition-colors"
             >
               <Mail className="w-4 h-4" />
-              hello@avukatistanbul.com
+              hello@avukatistanbul.net
             </a>
           </div>
 
