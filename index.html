@@ -34,6 +34,31 @@
       name="twitter:description"
       content="İstanbul'da uzmanlık alanına göre doğrulanmış avukatları bulun."
     />
+
+    <!--
+      GA4 + Microsoft Clarity. Replace TODO_GA4_ID with the live GA4
+      measurement ID (e.g. "G-XXXXXXXXXX") and TODO_CLARITY_ID with the
+      Clarity project id once provisioned. Tags are commented out until
+      then so dev/preview environments don't pollute analytics.
+    -->
+    <!-- TODO(GA4_ID): paste measurement id and uncomment
+    <script async src="https://www.googletagmanager.com/gtag/js?id=TODO_GA4_ID"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'TODO_GA4_ID', { send_page_view: true });
+    </script>
+    -->
+    <!-- TODO(CLARITY_ID): paste clarity project id and uncomment
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "TODO_CLARITY_ID");
+    </script>
+    -->
   </head>
   <body>
     <div id="root"></div>
