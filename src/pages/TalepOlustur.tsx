@@ -4,6 +4,7 @@ import { ChevronRight, Clock, ShieldCheck, BadgeCheck } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { MetaTags } from "@/components/seo/MetaTags";
+import { RequestForm } from "@/components/customer/RequestForm";
 
 export default function TalepOlustur() {
   return (
@@ -40,36 +41,22 @@ export default function TalepOlustur() {
             </p>
             <ul className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-sm text-primary-foreground/80">
               <li className="inline-flex items-center gap-1.5">
-                <BadgeCheck className="w-4 h-4 text-accent" /> Ücretsiz
+                <BadgeCheck className="w-4 h-4 text-accent" strokeWidth={1.75} /> Ücretsiz
               </li>
               <li className="inline-flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-accent" /> 24 saat içinde yanıt
+                <Clock className="w-4 h-4 text-accent" strokeWidth={1.75} /> 24 saat içinde yanıt
               </li>
               <li className="inline-flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-accent" /> Bilgileriniz
-                gizli
+                <ShieldCheck className="w-4 h-4 text-accent" strokeWidth={1.75} /> Bilgileriniz gizli
               </li>
             </ul>
           </div>
         </section>
 
-        <section className="py-16 lg:py-20">
+        <section className="py-14 lg:py-18">
           <div className="container-main">
-            <div className="max-w-2xl mx-auto rounded-xl border border-dashed border-border bg-card p-10 text-center">
-              <h2 className="font-serif text-2xl font-semibold mb-3">
-                Talep formu yakında aktif
-              </h2>
-              <p className="text-muted-foreground">
-                Müşteri talep akışı şu anda geliştiriliyor. İhtiyacınız varsa
-                bu süreçte{" "}
-                <a
-                  href="mailto:hello@avukatistanbul.net"
-                  className="text-accent font-medium link-underline"
-                >
-                  hello@avukatistanbul.net
-                </a>{" "}
-                adresine yazabilirsiniz.
-              </p>
+            <div className="mx-auto max-w-2xl rounded-xl border border-border bg-card p-8 sm:p-10 shadow-soft">
+              <RequestForm />
             </div>
           </div>
         </section>
