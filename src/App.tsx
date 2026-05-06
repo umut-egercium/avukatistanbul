@@ -9,7 +9,12 @@ import TalepOlustur from "@/pages/TalepOlustur";
 import RequestSuccess from "@/pages/RequestSuccess";
 import Taleplerim from "@/pages/Taleplerim";
 import AvukatKayit from "@/pages/AvukatKayit";
+import Giris from "@/pages/Giris";
+import SifreSifirla from "@/pages/SifreSifirla";
 import NotFound from "@/pages/NotFound";
+
+import PanelLayout from "@/pages/panel/PanelLayout";
+import PanelDashboard from "@/pages/panel/PanelDashboard";
 
 function App() {
   return (
@@ -25,6 +30,13 @@ function App() {
       <Route path="/talep-basarili" element={<RequestSuccess />} />
       <Route path="/taleplerim" element={<Taleplerim />} />
       <Route path="/avukat-kayit" element={<AvukatKayit />} />
+      {/* Auth (Agent 3) */}
+      <Route path="/giris" element={<Giris />} />
+      <Route path="/sifre-sifirla" element={<SifreSifirla />} />
+      {/* Lawyer panel (Agent 3) */}
+      <Route path="/panel" element={<PanelLayout />}>
+        <Route index element={<PanelDashboard />} />
+      </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
