@@ -80,6 +80,45 @@ export function breadcrumbLd(
   };
 }
 
+export function blogPostingLd(opts: {
+  headline: string;
+  description: string;
+  datePublished: string;
+  dateModified?: string;
+  path: string;
+  authorName?: string;
+  image?: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: opts.headline,
+    description: opts.description,
+    datePublished: opts.datePublished,
+    dateModified: opts.dateModified ?? opts.datePublished,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${SITE_CONFIG.url}${opts.path}`,
+    },
+    author: {
+      "@type": "Organization",
+      name: opts.authorName ?? SITE_CONFIG.name,
+      url: SITE_CONFIG.url,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: SITE_CONFIG.name,
+      url: SITE_CONFIG.url,
+      logo: {
+        "@type": "ImageObject",
+        url: `${SITE_CONFIG.url}/logo.svg`,
+      },
+    },
+    image: opts.image ?? SITE_CONFIG.defaultOgImage,
+    inLanguage: "tr-TR",
+  };
+}
+
 export function faqLd(faqs: Array<{ question: string; answer: string }>) {
   return {
     "@context": "https://schema.org",
