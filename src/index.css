@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 38 25% 97%;
+    --foreground: 218 35% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 218 35% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 218 35% 12%;
+
+    --primary: 218 55% 16%;
+    --primary-foreground: 38 25% 97%;
+
+    --secondary: 38 22% 92%;
+    --secondary-foreground: 218 35% 14%;
+
+    --muted: 38 18% 90%;
+    --muted-foreground: 218 12% 40%;
+
+    --accent: 36 50% 48%;
+    --accent-foreground: 218 55% 14%;
+
+    --cta: 218 55% 16%;
+    --cta-foreground: 38 25% 97%;
+    --cta-hover: 218 55% 22%;
+
+    --destructive: 0 70% 45%;
+    --destructive-foreground: 38 25% 97%;
+
+    --border: 218 15% 87%;
+    --input: 218 15% 87%;
+    --ring: 218 55% 28%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: theme("fontFamily.sans");
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: theme("fontFamily.serif");
+    letter-spacing: -0.015em;
+    font-feature-settings: "ss01";
+  }
+
+  ::selection {
+    background-color: hsl(var(--accent) / 0.25);
+    color: hsl(var(--foreground));
+  }
+}
+
+@layer components {
+  .container-main {
+    @apply mx-auto px-5 sm:px-6 lg:px-8 max-w-7xl;
+  }
+
+  .hero-gradient {
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, hsl(36 50% 48% / 0.10), transparent 60%),
+      linear-gradient(180deg, hsl(218 60% 14%) 0%, hsl(218 65% 9%) 100%);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  .link-underline {
+    @apply relative;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 100% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.2s ease;
+  }
+  .link-underline:hover {
+    background-size: 100% 2px;
+  }
+
+  .prose-legal {
+    @apply text-foreground/90 leading-relaxed;
+  }
+  .prose-legal h2 {
+    @apply text-2xl sm:text-3xl mt-12 mb-4 font-semibold;
+  }
+  .prose-legal h3 {
+    @apply text-xl mt-8 mb-3 font-semibold;
+  }
+  .prose-legal p {
+    @apply mb-5;
+  }
+  .prose-legal ul {
+    @apply mb-5 pl-6 list-disc space-y-2;
+  }
+  .prose-legal ol {
+    @apply mb-5 pl-6 list-decimal space-y-2;
+  }
+  .prose-legal a {
+    @apply text-accent font-medium link-underline;
+  }
+  .prose-legal strong {
+    @apply font-semibold text-foreground;
+  }
+}
