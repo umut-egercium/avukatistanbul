@@ -15,6 +15,11 @@ import NotFound from "@/pages/NotFound";
 
 import PanelLayout from "@/pages/panel/PanelLayout";
 import PanelDashboard from "@/pages/panel/PanelDashboard";
+import PanelProfile from "@/pages/panel/PanelProfile";
+import PanelVerification from "@/pages/panel/PanelVerification";
+import PanelLeads from "@/pages/panel/PanelLeads";
+import PanelQuotes from "@/pages/panel/PanelQuotes";
+import PanelCredits from "@/pages/panel/PanelCredits";
 
 function App() {
   return (
@@ -36,6 +41,11 @@ function App() {
       {/* Lawyer panel (Agent 3) */}
       <Route path="/panel" element={<PanelLayout />}>
         <Route index element={<PanelDashboard />} />
+        <Route path="profil" element={<PanelProfile />} />
+        <Route path="dogrulama" element={<PanelVerification />} />
+        <Route path="talepler" element={<PanelLeads />} />
+        <Route path="teklifler" element={<PanelQuotes />} />
+        <Route path="krediler" element={<PanelCredits />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
