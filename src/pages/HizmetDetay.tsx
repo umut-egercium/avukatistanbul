@@ -16,9 +16,31 @@ import {
   bosanmaHukukuArticle,
   type CategoryArticle,
 } from "@/content/categories/bosanma-hukuku";
+import { cezaHukukuArticle } from "@/content/categories/ceza-hukuku";
+import { isHukukuArticle } from "@/content/categories/is-hukuku";
+import { tazminatHukukuArticle } from "@/content/categories/tazminat-hukuku";
+import { mirasHukukuArticle } from "@/content/categories/miras-hukuku";
+import { gayrimenkulKiraHukukuArticle } from "@/content/categories/gayrimenkul-kira-hukuku";
+import { ticaretHukukuArticle } from "@/content/categories/ticaret-hukuku";
+import { icraIflasHukukuArticle } from "@/content/categories/icra-iflas-hukuku";
+import { aileHukukuArticle } from "@/content/categories/aile-hukuku";
+import { tuketiciHukukuArticle } from "@/content/categories/tuketici-hukuku";
+import { yabancilarHukukuArticle } from "@/content/categories/yabancilar-hukuku";
+import { kvkkBilisimHukukuArticle } from "@/content/categories/kvkk-bilisim-hukuku";
 
 const ARTICLES: Record<string, CategoryArticle> = {
   "bosanma-hukuku": bosanmaHukukuArticle,
+  "ceza-hukuku": cezaHukukuArticle,
+  "is-hukuku": isHukukuArticle,
+  "tazminat-hukuku": tazminatHukukuArticle,
+  "miras-hukuku": mirasHukukuArticle,
+  "gayrimenkul-kira-hukuku": gayrimenkulKiraHukukuArticle,
+  "ticaret-hukuku": ticaretHukukuArticle,
+  "icra-iflas-hukuku": icraIflasHukukuArticle,
+  "aile-hukuku": aileHukukuArticle,
+  "tuketici-hukuku": tuketiciHukukuArticle,
+  "yabancilar-hukuku": yabancilarHukukuArticle,
+  "kvkk-bilisim-hukuku": kvkkBilisimHukukuArticle,
 };
 
 export default function HizmetDetay() {
