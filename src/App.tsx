@@ -21,6 +21,11 @@ import PanelLeads from "@/pages/panel/PanelLeads";
 import PanelQuotes from "@/pages/panel/PanelQuotes";
 import PanelCredits from "@/pages/panel/PanelCredits";
 
+import AdminLayout from "@/pages/admin/AdminLayout";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import AdminApplications from "@/pages/admin/AdminApplications";
+import AdminLawyers from "@/pages/admin/AdminLawyers";
+
 function App() {
   return (
     <Routes>
@@ -46,6 +51,12 @@ function App() {
         <Route path="talepler" element={<PanelLeads />} />
         <Route path="teklifler" element={<PanelQuotes />} />
         <Route path="krediler" element={<PanelCredits />} />
+      </Route>
+      {/* Admin (Agent 3) */}
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<AdminDashboard />} />
+        <Route path="basvurular" element={<AdminApplications />} />
+        <Route path="avukatlar" element={<AdminLawyers />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
