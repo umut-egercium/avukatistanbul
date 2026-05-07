@@ -29,7 +29,7 @@ boundaries.
   writes `notify-lawyers`. Agent 2 writes none.
 - **Phase 5 (analytics) and Phase 6 (deploy/polish) are interleaved** rather
   than assigned to a separate agent. Each track adds its own analytics
-  events as it builds. Agent 3 owns Cloudflare Pages connect because deploy
+  events as it builds. Agent 3 owns Cloudflare Workers deploy because deploy
   failure is most likely to come from auth/edge-function side and they have
   the deepest backend context.
 

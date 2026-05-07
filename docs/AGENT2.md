@@ -277,6 +277,6 @@ semantic tokens (`bg-card`, `text-foreground`, etc.).
 - Admin `/admin/*` — Agent 3.
 - Lead notification edge function — Agent 3.
 - Long-form content (articles, blog) — Agent 1.
-- Cloudflare Pages connect — Agent 3.
+- Cloudflare deploy / custom domain — Agent 3.
 - Server-side analytics relay (`ga-mp-track` edge function) — Agent 3 if
   they have time, otherwise Phase 7.

@@ -1,9 +1,10 @@
 # AvukatIstanbul
 
-Two-sided marketplace at **avukatistanbul.net** (in development) — connects
-people searching for an İstanbul lawyer with verified İstanbul Barosu
-attorneys. Customers post their legal need; lawyers buy lead access in their
-practice area.
+Two-sided marketplace at **avukatistanbul.net** — connects people searching
+for an İstanbul lawyer with verified İstanbul Barosu attorneys. Customers
+post their legal need; verified lawyers receive matching leads by email
+and respond through their panel. Free for both sides — no credit-purchase
+or payment flow.
 
 ## Quick start
 
@@ -55,8 +56,17 @@ supabase/
 
 ## Deployment
 
-The repo is wired for **Cloudflare Pages** auto-deploy from `main`. Build
-command: `npm run build`. Output directory: `dist`.
+Hosted on **Cloudflare Workers** (not Pages) per `wrangler.jsonc`. The
+Worker (`worker/index.ts`) proxies `/sitemap.xml` to a Supabase edge
+function and serves the Vite build output (`./dist`) with SPA fallback.
+
+```bash
+npm run build                  # tsc -b && vite build → ./dist
+npx wrangler@latest deploy     # uploads dist/ to the Worker
+```
+
+First-time setup needs `npx wrangler@latest login` (browser OAuth).
+See `docs/RUNBOOK.md` for the full deploy + custom-domain procedure.
 
 ## Database / Supabase
 
@@ -74,10 +84,13 @@ migration-managed end to end.
 
 ## Status
 
-This repo is currently at **Phase 0** — the brand, design system, public
-pages and database schema are in place. The customer request flow, lawyer
-panel, payments and per-area blog content roll out in subsequent phases.
-See `CLAUDE.md` for the canonical session-onboarding doc.
+Live. Customer request flow, lawyer signup + panel, admin queue, and the
+lead-notification pipeline (pg_net trigger → `notify-lawyers` edge
+function) are all shipped. Outstanding items (blog content + Resend +
+first-admin bootstrap) tracked in `TODO.md`.
+
+See `CLAUDE.md` for the canonical session-onboarding doc and
+`docs/RUNBOOK.md` for ops procedures.
 
 ## License
 

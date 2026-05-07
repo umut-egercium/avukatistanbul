@@ -2,8 +2,8 @@
 
 **One-line:** Two-sided marketplace at `avukatistanbul.net` connecting people searching for İstanbul lawyers with verified İstanbul Barosu attorneys. Customers post requests; verified lawyers receive matching leads by email and submit quotes through their panel. The marketplace is free for both sides — no credit-purchase or payment flow.
 
-**Domain:** `avukatistanbul.net` (not yet pointed at hosting)
-**Hosting:** Cloudflare Pages (not yet connected — repo is `umut-egercium/avukatistanbul`)
+**Domain:** `avukatistanbul.net` (live as of 2026-05-07, on Cloudflare DNS, custom domain bound to the Worker; default Worker URL also live at `avukatistanbul.umut-091.workers.dev`)
+**Hosting:** Cloudflare **Worker** (not Pages — see `wrangler.jsonc`). Deploys via `npx wrangler deploy`. The Worker (`worker/index.ts`) proxies `/sitemap.xml` to the Supabase edge function and delegates everything else to the static-assets binding with SPA fallback (`not_found_handling: "single-page-application"`).
 **Repo:** `~/Documents/avukatistanbul`
 **Built fresh in 2026-05-06 session;** intentionally NOT a fork or copy of `musavirbul-36f6bc47`. Patterns where similar are deliberate (data model, analytics design, migration policy); design language is fully different.
 
@@ -49,6 +49,7 @@
 - **Ref:** `kcukkqnkhvhphfdebcuh` (URL: `https://kcukkqnkhvhphfdebcuh.supabase.co`)
 - **CLI link state:** `supabase/.temp/project-ref` (gitignored)
 - **DB password:** `~/.config/avukatistanbul/db-password` (mode 600, outside repo)
+- **Public anon key + URL** are also hardcoded as a fallback in `src/integrations/supabase/client.ts` so the bundle works regardless of build-env (Cloudflare's remote builds don't see gitignored `.env`). Env vars `??` override the fallback when present.
 
 ### Tables (Phase 0)
 
@@ -110,12 +111,15 @@ supabase/
 | Phase | What | Status |
 |-------|------|--------|
 | **0** | Repo, design system, home + 1 hizmet page (Boşanma), schema | **Done — 2026-05-06** |
-| 1 | 11 remaining hizmet detail pages (1500-2000 words each), 36 blog posts (3 per area) | Not started |
-| 2 | Customer request flow `/talep-olustur` + lawyer directory `/avukat-bul/...` | Not started |
-| 3 | Lawyer signup `/avukat-kayit` + lawyer panel `/panel/...` + admin verification `/admin/...` | Not started |
-| 4 | Lead notifications (resend) + lawyer-side analytics events | Not started |
-| 5 | GA4 + dual-send Measurement Protocol + Ads conversion (gclid → enhanced conversions), A/B helper | Not started |
-| 6 | Cloudflare Pages connect + custom domain + Lighthouse polish | Not started |
+| 1 | 11 remaining hizmet detail pages (1500-2000 words each), 36 blog posts (3 per area), sitemap, robots.txt | **Local only** — Agent 1's branch has the work but was never pushed to origin (3 commits on local `agent1/content`); not yet merged into main |
+| 2 | Customer request flow `/talep-olustur` + lawyer directory `/avukat-bul/...` + lawyer profile `/avukat/:slug` | **Done — 2026-05-06** (Agent 2 merged at `3485820`) |
+| 3 | Lawyer signup `/avukat-kayit` + lawyer panel `/panel/...` + admin verification `/admin/...` | **Done — 2026-05-06** (Agent 3 merged at `2e5e0c8`) |
+| 4 | Lead notifications via Resend (`notify-lawyers` edge function + pg_net trigger) | **Pipeline shipped, email send not wired** — function falls back to console-log until `RESEND_API_KEY` secret is set + `avukatistanbul.net` is verified in Resend |
+| 5 | GA4 + Microsoft Clarity wired in `index.html` (`G-2EBVBZ8P5R` + `wmyqn4zu64`); dual-send Measurement Protocol + Ads conversion + A/B helper | **GA4/Clarity done; MP relay + A/B helper pending** |
+| 6 | Cloudflare Worker deploy + `avukatistanbul.net` custom domain + SSL | **Done — 2026-05-07** |
+| 7 | Lawyer-side analytics events (`trackLawyerPanelEvent` extension on `src/lib/analytics.ts`) + Lighthouse polish | Not started |
+
+The credit-purchase / iyzico / payment system from the original 8-part roadmap was scrapped 2026-05-06. Marketplace is free for both sides.
 
 ## Things that will surprise next-session-Claude
 
@@ -129,11 +133,13 @@ supabase/
 
 ## How to start a new session productively
 
-1. Read this file and `git log --oneline -10`.
-2. If the user mentions "Phase N", refer to the table above.
-3. For migrations: see `README.md` § "Database / Supabase".
-4. Long-form content: copy `src/content/categories/bosanma-hukuku.tsx` as the template; legal accuracy matters (cite TMK / İYUK / TCK articles where appropriate).
-5. Before pushing to `main`, `npm run build` must succeed locally.
+1. Read this file, `docs/RUNBOOK.md`, and `git log --oneline -10`.
+2. Check `TODO.md` at repo root for the open backlog (Agent 1 merge, Resend wiring, admin bootstrap, etc.).
+3. If the user mentions "Phase N", refer to the table above.
+4. For migrations: see `docs/RUNBOOK.md` § Database migrations.
+5. For deploy + custom domain ops: see `docs/RUNBOOK.md` § Cloudflare Workers deploy.
+6. Long-form content: copy `src/content/categories/bosanma-hukuku.tsx` as the template; legal accuracy matters (cite TMK / İYUK / TCK articles where appropriate).
+7. Before pushing to `main`, `npm run build` must succeed locally.
 
 ## Multi-agent workstream
 
@@ -148,4 +154,4 @@ Each agent file lists owned files, coordination seams with the other tracks, and
 
 ---
 
-**Last meaningful update:** 2026-05-06 — Phase 0 complete.
+**Last meaningful update:** 2026-05-07 — Worker deployed, `avukatistanbul.net` custom domain live, docs synced. See `TODO.md` for what's left.

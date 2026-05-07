@@ -199,68 +199,72 @@ supabase db query --linked "delete from public.requests where customer_name = 'S
 
 ---
 
-## Cloudflare Pages deploy
+## Cloudflare Workers deploy
 
-The repo is built around Cloudflare Pages auto-deploy from `main`. The
-heavy lifting is on you the operator (UI/dashboard work). This section
-walks you through the one-time setup.
+The site is hosted on a Cloudflare **Worker**, not Cloudflare Pages.
+Config lives in `wrangler.jsonc` (Worker name `avukatistanbul`,
+`main: worker/index.ts`, static assets in `./dist` with SPA fallback).
+The Worker entrypoint (`worker/index.ts`) proxies `/sitemap.xml` to
+the Supabase sitemap edge function and delegates everything else to
+the assets binding.
 
-### One-time: connect the repo
+### Deploying
 
-1. Sign in to https://dash.cloudflare.com → **Workers & Pages**
-2. **Create application** → **Pages** → **Connect to Git**
-3. Authorize GitHub access; pick `umut-egercium/avukatistanbul`
-4. **Set up builds and deployments:**
-   - Project name: `avukatistanbul`
-   - Production branch: `main`
-   - Framework preset: `Vite` (or "None" — both work)
-   - Build command: `npm run build`
-   - Build output directory: `dist`
-   - Root directory: `/` (default)
-5. **Environment variables** (Production scope):
-   - `VITE_SUPABASE_URL` → `https://kcukkqnkhvhphfdebcuh.supabase.co`
-   - `VITE_SUPABASE_ANON_KEY` → (the anon JWT from `.env`)
-   - `VITE_SUPABASE_PROJECT_ID` → `kcukkqnkhvhphfdebcuh`
-   - `NODE_VERSION` → `20`
-6. Click **Save and Deploy**. The first build takes ~2 minutes.
-
-The preview URL will look like
-`https://avukatistanbul-xxxx.pages.dev`. Smoke-test before pointing the
-custom domain at it.
-
-### `_redirects` file
-
-`public/_redirects` ships with the build and tells Cloudflare:
-1. Proxy `/sitemap.xml` to the Supabase sitemap function
-2. Serve `index.html` for any unmatched path (SPA fallback for React Router)
-
-The file content is fixed:
-
-```
-/sitemap.xml https://kcukkqnkhvhphfdebcuh.supabase.co/functions/v1/sitemap 200
-/* /index.html 200
+```bash
+cd ~/Documents/avukatistanbul
+npm run build                       # tsc -b && vite build → ./dist
+npx wrangler@latest login           # one-time browser OAuth
+npx wrangler@latest deploy          # uploads dist/ to the Worker
 ```
 
-If `public/_redirects` is missing from a deploy, the preview URL will
-404 on every non-root path. (This file is the responsibility of
-**Agent 1** in the multi-agent split, but lives in the shared `public/`
-folder; ensure it's in any branch you deploy.)
+After `wrangler login`, auth persists at
+`~/Library/Preferences/.wrangler/config/default.toml` (macOS) so future
+`deploy` calls run without prompting. CI alternative: set
+`CLOUDFLARE_API_TOKEN` env var (token created in dash → My Profile →
+API Tokens, "Edit Cloudflare Workers" template).
+
+The default Worker URL is `avukatistanbul.umut-091.workers.dev`. The
+custom domain is `avukatistanbul.net` (see below).
+
+### Important: env vars at build time
+
+Vite inlines `import.meta.env.VITE_*` values at **build time**. Since
+`.env` is gitignored, a build run on a fresh machine (or in CI) won't
+see those values, and the Supabase client would fail on init →
+blank page. To avoid this, `src/integrations/supabase/client.ts`
+hardcodes the public Supabase URL + anon key as a fallback. The
+fallback is overridden by `import.meta.env.VITE_SUPABASE_URL` /
+`VITE_SUPABASE_ANON_KEY` when present (e.g., local dev with `.env`).
+
+If you ever add private values that **must** come from env (you
+generally shouldn't — the bundle ships to browsers), make sure they're
+present at build time wherever the deploy runs.
 
 ### Custom domain (avukatistanbul.net)
 
-Once the preview URL is happy:
+Already wired up as of 2026-05-07. To add another custom domain:
 
-1. Buy/own `avukatistanbul.net`. The DNS records can live wherever (CF
-   registrar, Namecheap, etc.).
-2. In CF Pages → your project → **Custom domains** → **Set up a custom
-   domain** → enter `avukatistanbul.net`.
-3. CF will display the DNS records to add at your registrar:
-   - `avukatistanbul.net` → CNAME → `<project>.pages.dev` (or A records
-     CF specifies)
-   - `www.avukatistanbul.net` → CNAME → `<project>.pages.dev`
-4. Once DNS propagates (usually <10min, can be up to 24h), CF
-   provisions an SSL cert automatically.
-5. Verify HTTPS works on `https://avukatistanbul.net`.
+1. Make sure the domain is on Cloudflare DNS (nameservers point at CF).
+2. **Workers & Pages** → `avukatistanbul` → **Settings** → **Domains
+   & Routes** → **+ Add** → **Custom Domain** → enter the hostname.
+3. CF auto-creates the DNS record (CNAME-flatten/A) and provisions
+   SSL via Let's Encrypt (~1-2 min).
+
+Both `avukatistanbul.net` and `www.avukatistanbul.net` are configured.
+
+### `public/_redirects`
+
+This file is a Cloudflare **Pages** convention; Workers ignore it. It's
+in the repo for legacy reasons (Agent 1 wrote it during the multi-agent
+build) but **does nothing** at runtime on the current Worker deploy.
+The equivalent behavior is provided by:
+
+- `worker/index.ts` — the `/sitemap.xml` proxy
+- `wrangler.jsonc` — `assets.not_found_handling: "single-page-application"`
+  for the SPA catch-all
+
+You can safely delete `public/_redirects` if you want; not removed yet
+to keep the diff small.
 
 ---
 

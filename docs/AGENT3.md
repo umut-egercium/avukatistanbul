@@ -170,28 +170,35 @@ export function trackLawyerPanelEvent(
 Call sites: `PanelDashboard` mount, `PanelLeads` row expand,
 `PanelQuotes` quote send, `PanelVerification` submit.
 
-## Track 3G — Cloudflare Pages connect & deploy
+## Track 3G — Cloudflare Workers deploy + custom domain
 
-Once Agent 1 has the sitemap edge function and Agent 2 has the request
-flow merged, you wire production deploy:
+**Shipped 2026-05-07.** What landed:
 
-1. In Cloudflare Pages dashboard, connect `umut-egercium/avukatistanbul`
-2. Build command: `npm run build`. Output: `dist`. Node version: 20+
-3. Environment variables: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`,
-   `VITE_SUPABASE_PROJECT_ID` (matches `.env.example`)
-4. Add `_redirects` (or `public/_redirects`):
-   ```
-   /sitemap.xml https://kcukkqnkhvhphfdebcuh.supabase.co/functions/v1/sitemap 200
-   /* /index.html 200
-   ```
-5. Once `avukatistanbul.net` DNS is active, add the custom domain in CF
-   Pages and verify
-6. Verify Lighthouse score on home + 1 hizmet page + 1 blog post + 1
-   lawyer profile. Target ≥ 90 on Performance and SEO. Document any
-   regressions.
+1. `wrangler.jsonc` — Worker config (name `avukatistanbul`, `main:
+   worker/index.ts`, static-assets binding for `./dist` with SPA
+   fallback).
+2. `worker/index.ts` — proxies `/sitemap.xml` to the Supabase sitemap
+   edge function; everything else → assets binding.
+3. `src/integrations/supabase/client.ts` — public Supabase URL + anon
+   key hardcoded as fallback so the bundle works regardless of build-env
+   (Cloudflare's remote builds don't see gitignored `.env`).
+4. Deploy via `npx wrangler@latest login && npx wrangler@latest deploy`.
+   Default URL `avukatistanbul.umut-091.workers.dev`.
+5. Custom domain `avukatistanbul.net` (and `www.avukatistanbul.net`)
+   bound through Workers Custom Domain UI; DNS on Cloudflare; SSL
+   auto-provisioned via Let's Encrypt.
 
-Write `docs/RUNBOOK.md` covering: applying migrations, deploying edge
-functions, rotating Supabase service role, common breakage one-liners.
+Note: this is **Cloudflare Workers**, not Cloudflare Pages. The earlier
+draft of this track assumed Pages; the production deploy ended up using
+Workers because of the `/sitemap.xml` proxy requirement (Pages
+`_redirects` doesn't allow proxying to external origins). `public/_redirects`
+exists in the repo but is ignored by the Worker.
+
+Lighthouse polish — not yet done. See `TODO.md`.
+
+`docs/RUNBOOK.md` is the canonical operations doc; covers migrations,
+edge functions, deploys, custom domain ops, admin bootstrap, Resend
+wiring, common breakage.
 
 ## File ownership
 
@@ -237,8 +244,8 @@ functions, rotating Supabase service role, common breakage one-liners.
   lawyers in the matching practice area + city receive an email and
   a row appears in `request_notification_logs`.
 - `npm run build` clean. All migrations apply via `supabase db push --linked`.
-- Cloudflare Pages live on a preview URL; once domain DNS lands, the
-  custom domain serves correctly.
+- Cloudflare Worker live; `avukatistanbul.net` custom domain serves
+  with SSL.
 
 ## Coordination points
 

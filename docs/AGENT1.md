@@ -176,7 +176,9 @@ supabase functions deploy sitemap --no-verify-jwt --project-ref kcukkqnkhvhphfde
 
 Reference at `https://kcukkqnkhvhphfdebcuh.supabase.co/functions/v1/sitemap`.
 
-Add a Cloudflare Pages redirect rule (in `_redirects`) so that
+Add a Cloudflare-style redirect rule (in `_redirects` for Pages-style
+hosting; on Workers the equivalent is the `/sitemap.xml` branch in
+`worker/index.ts`) so that
 `/sitemap.xml` proxies to the function URL. Document this in `README.md`
 deploy section.
 
@@ -235,5 +237,5 @@ Sitemap: https://avukatistanbul.net/sitemap.xml
   page styling — Agent 2.
 - Lawyer signup, panel, admin — Agent 3.
 - GA4/Ads conversion code, A/B testing helper — Agent 2 owns those.
-- Cloudflare Pages config — Agent 3 connects; you provide the
+- Cloudflare deploy config (Workers) — Agent 3 connects; you provide the
   `_redirects` file content for the sitemap proxy.
