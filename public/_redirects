@@ -1,9 +1,7 @@
-# Cloudflare Pages redirect rules.
+# Workers Static Assets handles the SPA fallback automatically via
+# `not_found_handling: "single-page-application"` in wrangler.jsonc, so
+# no explicit /* → /index.html rule is needed.
 #
-# Rewrite /sitemap.xml → the sitemap edge function. The :200 forces a 200
-# response (proxy/rewrite) instead of a 30x redirect, so search engines
-# read the XML directly from this URL.
-/sitemap.xml https://kcukkqnkhvhphfdebcuh.supabase.co/functions/v1/sitemap 200
-
-# SPA fallback: client-side router handles every other path.
-/* /index.html 200
+# External proxy rewrites (e.g. /sitemap.xml → Supabase) are not
+# supported here; the sitemap is exposed directly at its Supabase URL
+# and referenced from robots.txt.
