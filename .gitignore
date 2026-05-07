@@ -31,3 +31,7 @@ dist-ssr
 # Supabase
 supabase/.temp
 supabase/.branches
+
+# Cloudflare Wrangler
+.wrangler/
+.dev.vars
